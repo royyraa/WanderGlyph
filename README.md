@@ -1,4 +1,4 @@
-# Wanderglyph
+# WanderGlyph
 
 [![Python](https://img.shields.io/badge/Python-3.7%2B-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
@@ -36,4 +36,73 @@
    ```bash
    git clone https://github.com/yourusername/wanderglyph.git
    cd wanderglyph
+2. Install the dependencies:
+   ```bash
+   pip install -r requirements.txt
+3. Download the required TIGER/Line shapefiles and place them in the appropriate directory.
+
+## 📖 Usage
+
+Analyze your GPS JSON data easily:
+
+```bash
+python wanderglyph.py --input your_data.json --output results/
+```
+
+Options:
+- `--input`: Path to your JSON file containing GPS coordinates.
+- `--output`: Directory where the generated maps and statistics will be saved.
+
+See all available options and help:
+
+```bash
+python wanderglyph.py --help
+```
+
+---
+
+## 📍 Example Outputs
+
+- Interactive maps of visited counties
+- Heatmaps illustrating point density
+- Trajectory paths showcasing recent movements
+- Statistics on county and state coverage
+
+*(Add screenshots or demo images here!)*
+
+---
+
+## 🛠️ Contributing
+
+Want to make Wanderglyph even better?
+
+1. Fork the repository
+2. Create a new branch:
+
+    ```bash
+    git checkout -b feature/YourFeature
+    ```
+
+3. Commit your changes:
+
+    ```bash
+    git commit -m "Add Your Feature"
+    ```
+
+4. Push to the branch:
+
+    ```bash
+    git push origin feature/YourFeature
+    ```
+
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](./LICENSE).
+
+---
+
 
