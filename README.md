@@ -41,23 +41,32 @@
    pip install -r requirements.txt
 3. Download the required TIGER/Line shapefiles and place them in the appropriate directory.
 
+
 ## 📖 Usage
-
-Analyze your GPS JSON data easily:
-
-```bash
-python wanderglyph.py --input your_data.json --output results/
-```
-
-Options:
-- `--input`: Path to your JSON file containing GPS coordinates.
-- `--output`: Directory where the generated maps and statistics will be saved.
-
-See all available options and help:
 
 ```bash
 python wanderglyph.py --help
 ```
+
+**Command-line options:**
+
+| Option | Description |
+|:------|:------------|
+| `-h, --help` | Show the help message and exit. |
+| `--json-file JSON_FILE` | **(Required)** Path to the input JSON file containing GPS data. |
+| `--output-map OUTPUT_MAP` | (Optional) Filename for the generated HTML map output. |
+| `--project-dir PROJECT_DIR` | (Optional) Directory containing necessary shapefiles for county matching. |
+| `--add-markers` | (Optional) Add individual GPS location markers to the output map. |
+| `--export-geojson EXPORT_GEOJSON` | (Optional) Export the matched counties as a GeoJSON file. |
+| `--export-points EXPORT_POINTS` | (Optional) Export the raw GPS points as a GeoJSON file. |
+| `--verbose, -v` | (Optional) Enable verbose logging for detailed output during processing. |
+
+### Example
+
+```bash
+python wanderglyph.py --json-file data/locations.json --output-map output/map.html --project-dir shapefiles/ --add-markers --verbose
+```
+
 
 ---
 
