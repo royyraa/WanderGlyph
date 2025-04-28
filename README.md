@@ -1,26 +1,39 @@
-# Location Mapper
+# Wanderglyph
 
-A Python toolkit for analyzing GPS data from JSON files, identifying the counties/states covered, and generating interactive maps.
+[![Python](https://img.shields.io/badge/Python-3.7%2B-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Made with ❤️](https://img.shields.io/badge/Made%20with-%E2%9D%A4-red.svg)](#)
 
-## Features
+**Wanderglyph** is a Python toolkit for visualizing and analyzing GPS journeys with interactive maps, heatmaps, and detailed coverage summaries.
 
-- Parse GPS coordinate data from JSON files
-- Map coordinates to counties and states (US)
-- Generate interactive web-based maps with multiple layers:
-  - Counties with points highlighted
+---
+
+## ✨ Features
+
+- 📍 Parse GPS coordinate data from JSON files
+- 🗺️ Map coordinates to U.S. counties and states
+- 🌐 Generate interactive web-based maps with:
+  - Highlighted counties and GPS points
   - State boundaries
-  - Heatmap of point density
-  - Clustered markers
-  - Recent path trajectory
-  - Coverage statistics
+  - Heatmaps showing point density
+  - Clustered location markers
+  - Recent path trajectories
+  - Coverage statistics and summaries
 
-## Requirements
+---
+
+## 📦 Requirements
 
 - Python 3.7+
-- Required packages listed in `requirements.txt`
-- County and State shapefiles (TIGER/Line from US Census Bureau)
+- Packages listed in [`requirements.txt`](./requirements.txt)
+- U.S. county and state shapefiles (TIGER/Line datasets from the [U.S. Census Bureau](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html))
 
-## Installation
+---
 
-1. Clone this repository
-2. Install dependencies:
+## 🚀 Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/wanderglyph.git
+   cd wanderglyph
+
