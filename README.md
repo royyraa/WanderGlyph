@@ -26,7 +26,15 @@
 
 - Python 3.7+
 - Packages listed in [`requirements.txt`](./requirements.txt)
-- U.S. county and state shapefiles (TIGER/Line datasets from the [U.S. Census Bureau](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html))
+- U.S. county and state shapefiles  
+  ([Download from U.S. Census Bureau TIGER/Line](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html))
+- GPS data in JSON format (e.g., from Google Maps Timeline)
+
+### How to Export GPS Data (Android)
+
+1. Open **Settings** ➔ **Location** ➔ **Location Services** ➔ **Timeline**.
+2. Tap **Export Timeline data**
+3. Follow the steps to export your location history as a JSON file.
 
 ---
 
