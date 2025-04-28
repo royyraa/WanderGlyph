@@ -75,7 +75,6 @@ python wanderglyph.py --help
 python wanderglyph.py --json-file data/locations.json --output-map output/map.html --project-dir shapefiles/ --add-markers --verbose
 ```
 
-
 ---
 
 ## 📍 Example Outputs
@@ -84,36 +83,15 @@ python wanderglyph.py --json-file data/locations.json --output-map output/map.ht
 - Heatmaps illustrating point density
 - Trajectory paths showcasing recent movements
 - Statistics on county and state coverage
-
 ![usage](png/usage.png)
-
 
 ---
 
 ## 🛠️ Contributing
 
-Want to make Wanderglyph even better?
-
-1. Fork the repository
-2. Create a new branch:
-
-    ```bash
-    git checkout -b feature/YourFeature
-    ```
-
-3. Commit your changes:
-
-    ```bash
-    git commit -m "Add Your Feature"
-    ```
-
-4. Push to the branch:
-
-    ```bash
-    git push origin feature/YourFeature
-    ```
-
-5. Open a Pull Request
+Fork | Branch | Commit | Push | PR 🚀  
+Wanderglyph is still in early development — we’re constantly adding and improving.  
+Got a feature idea or suggestion? Drop a line at **royyraa@outlook.com**.
 
 ---
 
