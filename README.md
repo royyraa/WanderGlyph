@@ -68,7 +68,8 @@ python wanderglyph.py --help
 - Trajectory paths showcasing recent movements
 - Statistics on county and state coverage
 
-*(Add screenshots or demo images here!)*
+![usage](png/usage.png)
+
 
 ---
 
