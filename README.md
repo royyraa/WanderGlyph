@@ -3,6 +3,9 @@
 [![Python](https://img.shields.io/badge/Python-3.7%2B-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Made with ❤️](https://img.shields.io/badge/Made%20with-%E2%9D%A4-red.svg)](#)
+<p align="center">
+  <img src="assets/logo.png" alt="Wanderglyph Logo" width="300"/>
+</p>
 
 **Wanderglyph** is a Python toolkit for visualizing and analyzing GPS journeys with interactive maps, heatmaps, and detailed coverage summaries.
 
