@@ -8,7 +8,9 @@ def extract_coordinates(point_data):
             lat = point_data.get("latitude")
             lon = point_data.get("longitude")
             if lat is not None and lon is not None:
-                return Point(lon, lat)
+                lat, lon = float(lat), float(lon)
+                if -90 <= lat <= 90 and -180 <= lon <= 180:
+                    return Point(lon, lat)
         elif isinstance(point_data, str):
             # Handle different string formats
             point_data = point_data.strip()

@@ -1,6 +1,8 @@
-folium==0.12.1
-geopandas==0.11.1
-pandas==1.5.3
-shapely==2.0.1
-tqdm==4.64.1
-htmlmin==0.1.12
+geopandas>=0.14
+folium>=0.15
+pandas>=2.0
+shapely>=2.0
+tqdm>=4.65
+htmlmin>=0.1.12
+# Optional: faster parsing of large Timeline JSON exports (>100 MB)
+# ijson>=3.2

@@ -45,3 +45,7 @@ ENV/
 *.dbf
 *.prj
 EOL
+*.json\n!package.json\n__pycache__/\n*.pkl\n.wanderglyph_cache/\n*.pyc\noutput_map.html
+TimelineApr2026.json
+output_map.html
+.wanderglyph_cache/
