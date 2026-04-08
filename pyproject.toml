@@ -1,0 +1,40 @@
+[build-system]
+requires      = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name        = "wanderglyph"
+version     = "1.0.0"
+description = "Interactive travel map from Google Timeline GPS exports"
+readme      = "README.md"
+license     = { file = "LICENSE" }
+authors     = [{ name = "Rajarshi Roy", email = "royyraa@outlook.com" }]
+keywords    = ["gps", "maps", "travel", "google-timeline", "folium", "geopandas"]
+requires-python = ">=3.10"
+
+dependencies = [
+    "geopandas>=0.14",
+    "folium>=0.15",
+    "pandas>=2.0",
+    "shapely>=2.0",
+    "tqdm>=4.65",
+    "htmlmin>=0.1.12",
+]
+
+[project.optional-dependencies]
+streaming = ["ijson>=3.2"]   # for large Timeline JSON files (>100 MB)
+
+[project.scripts]
+wanderglyph = "wanderglyph:main"
+
+[project.urls]
+Homepage   = "https://github.com/royyraa/WanderGlyph"
+Repository = "https://github.com/royyraa/WanderGlyph"
+Issues     = "https://github.com/royyraa/WanderGlyph/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.setuptools]
+py-modules = ["wanderglyph"]
