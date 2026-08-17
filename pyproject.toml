@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name        = "wanderglyph"
-version     = "1.0.0"
+version     = "1.1.0"
 description = "Interactive travel map from Google Timeline GPS exports"
 readme      = "README.md"
 license     = { file = "LICENSE" }
