@@ -192,36 +192,7 @@ First run downloads the boundary data (~3 MB) to `nps_boundary/nps_boundary.geoj
 
 ## 🎨 Color Scheme
 
-### Map themes
-
-| Theme | Region fill (GPS pings) | Region fill (time spent) | State borders | Base map |
-|---|---|---|---|---|
-| `light` | Blue `#3b82f6` ramp | Orange `#f97316` ramp | Red `#ef4444` | CartoDB Positron |
-| `dark` | Teal `#2dd4bf` ramp | Orange `#f97316` ramp | Red `#ef4444` | CartoDB Dark Matter |
-| `satellite` | Green `#34d399` ramp | Orange `#f97316` ramp | Red `#ef4444` | ESRI World Imagery |
-
-Each ramp runs light → dark across 5 buckets, based on how many GPS points (or how much time) that region accounts for relative to the others. A legend panel on the map shows the exact ranges.
-
-### Activity segment colours (all themes)
-
-| Activity | Colour |
-|---|---|
-| Walking / Running / Hiking | Green |
-| Cycling | Orange |
-| Driving / In vehicle | Blue |
-| Train / Bus / Subway / Ferry | Purple |
-| Flying | Red |
-| Other | Grey |
-
-### Special layers
-
-| Layer | Colour |
-|---|---|
-| 🏠 Home county | Gold `#f59e0b` |
-| 📌 Notable visits | Amber `#fbbf24` |
-| 🔥 Heatmap | Blue → Orange → Red gradient |
-| 📱 Recent path | Green |
-| 🌲 All NPS sites (unvisited) | Slate grey `#94a3b8` |
+Each theme (`light`, `dark`, `satellite`) uses its own color ramp for region coverage, plus consistent colors for activity segments (walking, cycling, driving, transit, flying) and special layers like the home county marker and heatmap. Exact colors and ranges are shown in the in-map legend.
 
 ---
 
