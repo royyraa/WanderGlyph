@@ -45,8 +45,8 @@
 ## 🚀 Installation
 
 ```bash
-git clone https://github.com/yourusername/wanderglyph.git
-cd wanderglyph
+git clone https://github.com/royyraa/WanderGlyph.git
+cd WanderGlyph
 python3 -m venv venv
 source venv/bin/activate
 pip install -e ".[dev]"     # or: pip install -r requirements.txt
@@ -62,6 +62,15 @@ Boundary data (U.S. counties, states, world countries, NPS units) is downloaded 
 2. Deselect all, then select **Location History (Timeline)**
 3. Choose **JSON** format and export
 4. Extract the downloaded `.zip` — you'll find one or more `Timeline.json` files
+
+Don't have an export handy, or just want to try WanderGlyph out first? Generate a fake one:
+
+```bash
+python generate_demo.py --output data/demo.json --years 2020 2021 2022 2023 2024
+python wanderglyph.py --json-file data/demo.json --theme dark --auto-download --open
+```
+
+`generate_demo.py` simulates a traveller visiting major US cities over the given years, complete with GPS paths, activity segments, and visit records — enough to exercise every feature without any real location data.
 
 ---
 
@@ -221,9 +230,12 @@ Each ramp runs light → dark across 5 buckets, based on how many GPS points (or
 ```
 WanderGlyph/
 ├── wanderglyph.py        # CLI entry point
+├── generate_demo.py      # Fake Timeline JSON generator, for trying WanderGlyph without real data
 ├── requirements.txt
 ├── pyproject.toml
+├── LICENSE
 ├── src/
+│   ├── __init__.py
 │   ├── core.py           # Orchestration
 │   ├── data_loader.py    # JSON parsing, shapefile/boundary loading
 │   ├── geo_utils.py      # Spatial join, home county lookup, dwell-time & distance stats
@@ -234,7 +246,8 @@ WanderGlyph/
 │   └── summary.py        # JSON summary report
 ├── tests/                # pytest suite for the core pipeline
 └── png/
-    └── logo.png
+    ├── logo.png
+    └── usage.png
 ```
 
 ---
