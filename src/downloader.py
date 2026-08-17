@@ -10,6 +10,7 @@ Sources
 
 import os
 import logging
+import urllib.parse
 import urllib.request
 import zipfile
 import tempfile
@@ -22,24 +23,42 @@ from tqdm import tqdm
 
 SHAPEFILES = {
     'county': {
-        'url': 'https://www2.census.gov/geo/tiger/TIGER2024/COUNTY/tl_2024_us_county.zip',
+        'kind':   'zip',
+        'url':    'https://www2.census.gov/geo/tiger/TIGER2024/COUNTY/tl_2024_us_county.zip',
         'subdir': 'tl_2024_us_county',
         'shp':    'tl_2024_us_county.shp',
         'label':  'US Counties (TIGER 2024)',
     },
     'state': {
-        'url': 'https://www2.census.gov/geo/tiger/TIGER2024/STATE/tl_2024_us_state.zip',
+        'kind':   'zip',
+        'url':    'https://www2.census.gov/geo/tiger/TIGER2024/STATE/tl_2024_us_state.zip',
         'subdir': 'tl_2024_us_state',
         'shp':    'tl_2024_us_state.shp',
         'label':  'US States (TIGER 2024)',
     },
     'world': {
-        'url': 'https://naciscdn.org/naturalearth/110m/cultural/ne_110m_admin_0_countries.zip',
+        'kind':   'zip',
+        'url':    'https://naciscdn.org/naturalearth/110m/cultural/ne_110m_admin_0_countries.zip',
         'subdir': 'ne_110m_admin_0_countries',
         'shp':    'ne_110m_admin_0_countries.shp',
         'label':  'World Countries (Natural Earth 110m)',
     },
+    'nps': {
+        'kind':   'nps_api',
+        'subdir': 'nps_boundary',
+        'shp':    'nps_boundary.geojson',
+        'label':  'NPS Unit Boundaries (National Park Service)',
+    },
 }
+
+# NPS Land Resources Division — official public boundary layer for all NPS
+# units (parks, monuments, historic sites, seashores, etc.), served live via
+# ArcGIS FeatureServer rather than a static zip like the Census/Natural Earth
+# sources above.
+NPS_BOUNDARY_QUERY_URL = (
+    'https://services1.arcgis.com/fBc8EJBxQRMcHlei/arcgis/rest/services/'
+    'NPS_Land_Resources_Division_Boundary_and_Tract_Data_Service/FeatureServer/2/query'
+)
 
 
 # ---------------------------------------------------------------------------
@@ -75,17 +94,45 @@ def _download_and_extract(url, label, dest_dir):
             pass
 
 
+def _download_nps_boundary(dest_dir):
+    """
+    Query the NPS Land Resources Division ArcGIS FeatureServer for all NPS
+    unit boundary polygons and save the result as a local GeoJSON file.
+
+    Geometry is simplified server-side (maxAllowableOffset) to keep the
+    response small — full-precision boundaries aren't needed for a
+    point-in-polygon match against GPS pings.
+    """
+    query = urllib.parse.urlencode({
+        'where':              '1=1',
+        'outFields':          'UNIT_CODE,UNIT_NAME,UNIT_TYPE,STATE,PARKNAME',
+        'returnGeometry':     'true',
+        'geometryPrecision':  '5',
+        'maxAllowableOffset': '0.0005',
+        'outSR':              '4326',
+        'f':                  'geojson',
+    })
+    url = f"{NPS_BOUNDARY_QUERY_URL}?{query}"
+    dest_path = os.path.join(dest_dir, 'nps_boundary.geojson')
+
+    logging.info("Downloading NPS Unit Boundaries…")
+    with urllib.request.urlopen(url, timeout=60) as resp:
+        data = resp.read()
+    with open(dest_path, 'wb') as f:
+        f.write(data)
+
+
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 
 def shapefile_path(name, project_dir):
-    """Return the expected .shp path for a named shapefile."""
+    """Return the expected .shp/.geojson path for a named shapefile."""
     info = SHAPEFILES[name]
     return os.path.join(project_dir, info['subdir'], info['shp'])
 
 
-def ensure_shapefiles(project_dir, need_world=False):
+def ensure_shapefiles(project_dir, need_world=False, need_nps=False):
     """
     Check for required shapefiles and download any that are missing.
 
@@ -95,6 +142,8 @@ def ensure_shapefiles(project_dir, need_world=False):
         Directory that contains (or will contain) shapefile sub-directories.
     need_world : bool
         Also ensure the world countries shapefile is present.
+    need_nps : bool
+        Also ensure the NPS unit boundary file is present.
 
     Returns
     -------
@@ -104,6 +153,8 @@ def ensure_shapefiles(project_dir, need_world=False):
     needed = ['county', 'state']
     if need_world:
         needed.append('world')
+    if need_nps:
+        needed.append('nps')
 
     all_ok = True
     for name in needed:
@@ -114,9 +165,12 @@ def ensure_shapefiles(project_dir, need_world=False):
         dest = os.path.join(project_dir, info['subdir'])
         os.makedirs(dest, exist_ok=True)
         try:
-            _download_and_extract(info['url'], info['label'], dest)
+            if info['kind'] == 'nps_api':
+                _download_nps_boundary(dest)
+            else:
+                _download_and_extract(info['url'], info['label'], dest)
             if not os.path.exists(shp):
-                logging.error(f"Expected shapefile not found after extraction: {shp}")
+                logging.error(f"Expected shapefile not found after download: {shp}")
                 all_ok = False
         except Exception as e:
             logging.error(f"Failed to download {info['label']}: {e}")

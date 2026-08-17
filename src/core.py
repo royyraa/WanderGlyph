@@ -13,7 +13,8 @@ from .data_loader import (
 )
 from .geo_utils import (
     find_matching_regions, get_states_from_counties, get_region_names,
-    find_home_county,
+    find_home_county, add_visit_stats, add_distance_from_home,
+    get_states_from_nps,
 )
 from .visualization import generate_map
 from . import cache, summary as summary_mod
@@ -80,7 +81,8 @@ def process_data(
     if auto_download:
         from .downloader import ensure_shapefiles
         need_world = (level == 'country')
-        if not ensure_shapefiles(project_dir, need_world=need_world):
+        need_nps   = (level == 'nps')
+        if not ensure_shapefiles(project_dir, need_world=need_world, need_nps=need_nps):
             raise RuntimeError("One or more shapefiles could not be downloaded.")
 
     # ── Load shapefiles ──────────────────────────────────────────────────────
@@ -112,6 +114,8 @@ def process_data(
     # ── Derive state names ───────────────────────────────────────────────────
     if level == 'county':
         state_names = get_states_from_counties(matched, states)
+    elif level == 'nps':
+        state_names = get_states_from_nps(matched)
     else:
         state_names = get_region_names(matched, level)
 
@@ -123,6 +127,14 @@ def process_data(
         home_county_gdf = find_home_county(home_county, regions, states)
         if home_county_gdf is not None:
             logging.info(f"Home county: {home_county_gdf.iloc[0]['NAME']}")
+
+    # ── Enrich matched regions with dwell-time & distance stats ──────────────
+    # Computed fresh every run (not cached) since they depend on `visits` and
+    # `home_county_gdf`, not just the point-in-region spatial join.
+    if not matched.empty:
+        matched = add_visit_stats(matched, visits, level=level)
+        if home_county_gdf is not None:
+            matched = add_distance_from_home(matched, home_county_gdf)
 
     # ── Generate map ─────────────────────────────────────────────────────────
     logging.info("Generating interactive map…")

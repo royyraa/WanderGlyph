@@ -18,11 +18,12 @@ dependencies = [
     "pandas>=2.0",
     "shapely>=2.0",
     "tqdm>=4.65",
-    "htmlmin>=0.1.12",
 ]
 
 [project.optional-dependencies]
 streaming = ["ijson>=3.2"]   # for large Timeline JSON files (>100 MB)
+minify = ["htmlmin>=0.1.12"] # smaller output HTML; requires Python <3.13 (uses stdlib `cgi`)
+dev = ["pytest>=8.0"]
 
 [project.scripts]
 wanderglyph = "wanderglyph:main"
@@ -38,3 +39,6 @@ include = ["src*"]
 
 [tool.setuptools]
 py-modules = ["wanderglyph"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

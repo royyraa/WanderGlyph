@@ -3,6 +3,7 @@ folium>=0.15
 pandas>=2.0
 shapely>=2.0
 tqdm>=4.65
-htmlmin>=0.1.12
 # Optional: faster parsing of large Timeline JSON exports (>100 MB)
 # ijson>=3.2
+# Optional: smaller output HTML; requires Python <3.13 (uses stdlib `cgi`)
+# htmlmin>=0.1.12

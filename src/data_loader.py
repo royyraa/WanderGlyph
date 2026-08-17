@@ -348,7 +348,7 @@ def load_shapefiles(project_dir, level='county'):
     """
     from .downloader import shapefile_path
 
-    def _load(name):
+    def _load(name, simplify_tolerance=0.01):
         shp = shapefile_path(name, project_dir)
         if not os.path.exists(shp):
             raise FileNotFoundError(
@@ -358,8 +358,13 @@ def load_shapefiles(project_dir, level='county'):
         gdf = gpd.read_file(shp)
         if gdf.crs is None or gdf.crs.to_epsg() != 4326:
             gdf = gdf.to_crs(epsg=4326)
+        # Repair self-intersecting geometry (buffer(0) is the standard fix)
+        # *before* filtering on validity — otherwise invalid-but-repairable
+        # shapes are silently dropped instead of fixed. Simplification can
+        # occasionally reintroduce invalidity, so repair again afterward.
+        gdf['geometry'] = gdf.geometry.buffer(0)
         gdf = gdf[gdf.geometry.is_valid].copy()
-        gdf['geometry'] = gdf['geometry'].simplify(0.01).buffer(0)
+        gdf['geometry'] = gdf['geometry'].simplify(simplify_tolerance).buffer(0)
         return gdf
 
     state_gdf = _load('state')
@@ -370,8 +375,15 @@ def load_shapefiles(project_dir, level='county'):
         regions = state_gdf.copy()
     elif level == 'country':
         regions = _load('world')
+    elif level == 'nps':
+        # NPS units range from huge (Death Valley) to building-scale
+        # (historic sites/memorials) — the default 0.01° (~1.1km) tolerance
+        # used for counties/states would flatten small units into
+        # degenerate shapes, so use a much finer tolerance here.
+        regions = _load('nps', simplify_tolerance=0.0002)
+        regions = regions.rename(columns={'UNIT_NAME': 'NAME', 'UNIT_CODE': 'GEOID'})
     else:
-        raise ValueError(f"Unknown level: {level!r}. Choose county, state, or country.")
+        raise ValueError(f"Unknown level: {level!r}. Choose county, state, country, or nps.")
 
     logging.info(f"Loaded {len(regions)} {level} regions")
     return regions, state_gdf

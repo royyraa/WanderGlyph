@@ -63,6 +63,7 @@ def generate(points, point_metadata, matched, state_names, activity_segments, le
         'county':  'counties',
         'state':   'states',
         'country': 'countries',
+        'nps':     'nps_sites',
     }.get(level, 'regions')
 
     return {

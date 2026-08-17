@@ -61,8 +61,10 @@ def build_parser():
 
     # ── Aggregation & appearance ─────────────────────────────────────────────
     p.add_argument(
-        '--level', choices=['county', 'state', 'country'], default='county',
-        help='Geographic aggregation level (default: county).',
+        '--level', choices=['county', 'state', 'country', 'nps'], default='county',
+        help='Geographic aggregation level (default: county). '
+             '"nps" matches against National Park Service unit boundaries '
+             '(parks, monuments, historic sites, etc.).',
     )
     p.add_argument(
         '--theme', choices=['light', 'dark', 'satellite'], default='light',
@@ -145,9 +147,10 @@ def main():
         dr = s.get('data_date_range', {})
         print("\n── WanderGlyph ─────────────────────────────")
         print(f"  GPS points       : {result['points_count']:,}")
-        level_plural = {'county': 'Counties', 'state': 'States', 'country': 'Countries'}[args.level]
+        level_plural = {'county': 'Counties', 'state': 'States', 'country': 'Countries', 'nps': 'NPS Sites'}[args.level]
         print(f"  {level_plural} matched   : {result['counties_matched']:,}")
-        print(f"  States covered   : {result['states_covered']}")
+        coverage_label = {'country': 'Countries covered'}.get(args.level, 'States covered')
+        print(f"  {coverage_label.ljust(17)}: {result['states_covered']}")
         print(f"  Activity segments: {result['activity_segments']:,}")
         print(f"  Notable visits   : {result['visits']:,}")
         if dr.get('start'):

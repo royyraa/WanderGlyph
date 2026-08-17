@@ -8,23 +8,25 @@
   <img src="png/logo.png" alt="WanderGlyph Logo" width="300"/>
 </p>
 
-**WanderGlyph** is a Python tool that turns your Google Timeline GPS export into a rich, interactive travel map — showing every U.S. county, state, or country you've ever visited, with activity trails, heatmaps, and year-over-year breakdowns.
+**WanderGlyph** turns your Google Timeline GPS export into a rich, interactive travel map — every U.S. county, state, or country you've ever visited, plus how many **National Park Service sites** you've covered — with activity trails, heatmaps, dwell-time analysis, and year-over-year breakdowns.
 
 ---
 
 ## ✨ Features
 
-- 🗺️ **County / State / Country** aggregation levels
-- 🎨 **Three map themes** — Light, Dark, Satellite
-- 🏠 **Home county highlight** — gold marker for your home base
+- 🗺️ **Four aggregation levels** — County, State, Country, or **NPS sites** (national parks, monuments, historic sites, etc.)
+- 🎨 **Three map themes** — Light, Dark, Satellite, all with a modern glassmorphism UI
+- 🏙️⏱️ **Two ways to see coverage** — toggle between "by GPS pings" and "by time spent" choropleths (ping density is a sampling artifact; dwell time from your `visit` records is the truer signal)
+- 🏠 **Home county highlight** — gold marker for your home base, plus a "farthest visited" distance stat
 - 🔥 **Heatmap** with colour gradient showing GPS density
 - 🚶 **Activity segments** — walking, driving, cycling, transit, flying — each as a separate toggleable layer
-- 📌 **Notable visits** — places you've stopped at
+- 📌 **Notable visits** — places you've stopped at, with visit counts and dwell time per region
 - 📅 **Year-over-year layers** — see how your travel grew over time
 - 📱 **Recent GPS path** — your last 100 recorded points as a trail
-- 📊 **Coverage statistics** — counties %, states, avg points per county
+- 📊 **Animated coverage panel** — regions visited, states covered, time tracked, and more
+- 🌲 **NPS mode** — see all 442 National Park Service units on the map (visited ones highlighted), a strict "National Parks visited" count, and a state-by-state browser
 - 📋 **JSON summary report** — exportable stats file
-- 📥 **Auto-download shapefiles** — no manual setup required
+- 📥 **Auto-download boundary data** — counties, states, world countries, and NPS units, cached locally after the first run
 - ⚡ **Spatial join cache** — re-runs on the same file are instant
 - 📁 **Multi-file / directory input** — combine multiple Timeline exports
 - 📆 **Date range filtering** — isolate any time period
@@ -34,7 +36,7 @@
 
 ## 📦 Requirements
 
-- Python 3.10+
+- Python 3.10+ (note: on Python 3.13+, optional HTML minification is unavailable — see [Notes](#-notes))
 - Dependencies listed in [`requirements.txt`](./requirements.txt)
 - A Google Timeline JSON export (see below)
 
@@ -45,10 +47,12 @@
 ```bash
 git clone https://github.com/yourusername/wanderglyph.git
 cd wanderglyph
-pip install -r requirements.txt
+python3 -m venv venv
+source venv/bin/activate
+pip install -e ".[dev]"     # or: pip install -r requirements.txt
 ```
 
-Shapefiles (U.S. counties, states, world countries) are downloaded automatically on first run when you pass `--auto-download`. No manual setup needed.
+Boundary data (U.S. counties, states, world countries, NPS units) is downloaded automatically the first time each level is used, when you pass `--auto-download`. After that, it's cached on disk and never re-downloaded.
 
 ---
 
@@ -66,8 +70,10 @@ Shapefiles (U.S. counties, states, world countries) are downloaded automatically
 ### Basic
 
 ```bash
-python wanderglyph.py --json-file Timeline.json
+python wanderglyph.py --json-file Timeline.json --auto-download --open
 ```
+
+`--auto-download` only matters on first run per level — it fetches the matching boundary data once and reuses it from disk on every run after. `--open` pops the finished map straight into your browser.
 
 ### With options
 
@@ -118,6 +124,37 @@ python wanderglyph.py --json-file Timeline.json \
   --summary        summary.json
 ```
 
+### Keeping multiple maps around
+
+Each run writes one self-contained HTML file and **overwrites** whatever's already at `--output-map` — it doesn't merge with a previous run. Give each level its own filename to keep them all:
+
+```bash
+python wanderglyph.py --json-file Timeline.json --level county --home-county "Travis County, TX" \
+  --output-map maps/county_map.html
+
+python wanderglyph.py --json-file Timeline.json --level nps --auto-download \
+  --output-map maps/nps_map.html --open
+```
+
+---
+
+## 🌲 NPS Mode — "How many National Park sites have I visited?"
+
+`--level nps` matches your GPS history against the **official NPS Land Resources Division boundary data** — all 442 National Park Service units nationwide (national parks, monuments, historic sites, seashores, memorials, battlefields, and more).
+
+```bash
+python wanderglyph.py --json-file Timeline.json --level nps --auto-download --open
+```
+
+What you get, beyond the standard coverage map:
+
+- **🌲 All NPS Sites layer** — every one of the 442 units drawn on the map (solid muted fill), so you can see the whole system, not just what you've hit. Visited ones stand out in color on top.
+- **🏔️ National Parks stat** — a strict count of the 62 units actually designated "National Park" (e.g. Yellowstone, Yosemite), separate from the broader "NPS sites visited" total which includes monuments, historic sites, etc.
+- **🔎 Browse by State** — a dropdown in the top-left of the map. Pick any state and see the list of NPS sites you've visited there, with type, GPS points, and time spent, sorted by most-visited first. (Desktop only for now — hidden on narrow/mobile screens to avoid clutter.)
+- Everything else works too: the 🏙️/⏱️ ping-density vs. time-spent toggle, popups with visit counts and first/last visit dates, all applied to NPS units instead of counties.
+
+First run downloads the boundary data (~3 MB) to `nps_boundary/nps_boundary.geojson` in your project directory; every run after that reuses the cached file.
+
 ---
 
 ## 🚩 Full CLI Reference
@@ -126,13 +163,13 @@ python wanderglyph.py --json-file Timeline.json \
 |---|---|---|
 | `--json-file PATH [PATH ...]` | **required** | One or more JSON files, or a directory |
 | `--output-map FILE` | `output_map.html` | Output HTML filename |
-| `--project-dir DIR` | `.` | Directory for shapefiles |
-| `--auto-download` | off | Download missing shapefiles automatically |
+| `--project-dir DIR` | `.` | Directory for boundary/shapefile data |
+| `--auto-download` | off | Download missing boundary data automatically |
 | `--start-date YYYY-MM-DD` | — | Only include points on/after this date |
 | `--end-date YYYY-MM-DD` | — | Only include points on/before this date |
-| `--level` | `county` | Aggregation level: `county` `state` `country` |
+| `--level` | `county` | Aggregation level: `county` `state` `country` `nps` |
 | `--theme` | `light` | Map theme: `light` `dark` `satellite` |
-| `--home-county "Name, ST"` | — | Highlight home county in gold e.g. `"Travis County, TX"` |
+| `--home-county "Name, ST"` | — | Highlight home county in gold e.g. `"Travis County, TX"` (county level only) |
 | `--add-markers` | off | Add clustered GPS markers |
 | `--export-geojson FILE` | — | Export matched regions as GeoJSON |
 | `--export-points FILE` | — | Export GPS points as GeoJSON |
@@ -148,11 +185,13 @@ python wanderglyph.py --json-file Timeline.json \
 
 ### Map themes
 
-| Theme | County fill | State borders | Base map |
-|---|---|---|---|
-| `light` | Blue `#3b82f6` | Red `#ef4444` | CartoDB Positron |
-| `dark` | Teal `#2dd4bf` | Red `#ef4444` | CartoDB Dark Matter |
-| `satellite` | Green `#34d399` | Red `#ef4444` | ESRI World Imagery |
+| Theme | Region fill (GPS pings) | Region fill (time spent) | State borders | Base map |
+|---|---|---|---|---|
+| `light` | Blue `#3b82f6` ramp | Orange `#f97316` ramp | Red `#ef4444` | CartoDB Positron |
+| `dark` | Teal `#2dd4bf` ramp | Orange `#f97316` ramp | Red `#ef4444` | CartoDB Dark Matter |
+| `satellite` | Green `#34d399` ramp | Orange `#f97316` ramp | Red `#ef4444` | ESRI World Imagery |
+
+Each ramp runs light → dark across 5 buckets, based on how many GPS points (or how much time) that region accounts for relative to the others. A legend panel on the map shows the exact ranges.
 
 ### Activity segment colours (all themes)
 
@@ -173,6 +212,7 @@ python wanderglyph.py --json-file Timeline.json \
 | 📌 Notable visits | Amber `#fbbf24` |
 | 🔥 Heatmap | Blue → Orange → Red gradient |
 | 📱 Recent path | Green |
+| 🌲 All NPS sites (unvisited) | Slate grey `#94a3b8` |
 
 ---
 
@@ -182,30 +222,51 @@ python wanderglyph.py --json-file Timeline.json \
 WanderGlyph/
 ├── wanderglyph.py        # CLI entry point
 ├── requirements.txt
+├── pyproject.toml
 ├── src/
 │   ├── core.py           # Orchestration
-│   ├── data_loader.py    # JSON parsing, shapefile loading
-│   ├── geo_utils.py      # Spatial join, home county lookup
+│   ├── data_loader.py    # JSON parsing, shapefile/boundary loading
+│   ├── geo_utils.py      # Spatial join, home county lookup, dwell-time & distance stats
 │   ├── visualization.py  # Folium map generation
 │   ├── coordinates.py    # Coordinate extraction
 │   ├── cache.py          # Spatial join result caching
-│   ├── downloader.py     # Auto-download shapefiles
+│   ├── downloader.py     # Auto-download boundary data (Census, Natural Earth, NPS)
 │   └── summary.py        # JSON summary report
+├── tests/                # pytest suite for the core pipeline
 └── png/
     └── logo.png
 ```
 
 ---
 
+## 🧪 Running the Tests
+
+```bash
+pip install -e ".[dev]"
+pytest
+```
+
+Covers coordinate parsing, JSON loading, spatial matching, home-county lookup, dwell-time/distance stats, and the caching layer.
+
+---
+
 ## 📍 Example Output
 
-- Interactive map of all visited counties / states / countries
+- Interactive map of all visited counties / states / countries / NPS sites
+- Toggleable GPS-density vs. time-spent choropleths, with a legend
 - Heatmap of GPS point density
 - Activity trails coloured by transport type
 - Year-by-year point layers
-- Coverage statistics panel
+- Animated coverage statistics panel, with a state-by-state NPS browser in `--level nps` mode
 
 ![usage](png/usage.png)
+
+---
+
+## 📝 Notes
+
+- **HTML minification is optional.** `htmlmin` shrinks the output file but fails to install on Python 3.13+ (it depends on the removed stdlib `cgi` module). If it's missing, WanderGlyph just skips minification and logs a note — maps still generate normally, just slightly larger.
+- **Large files (>100 MB)** parse faster with `ijson` installed: `pip install ijson` (or `pip install -e ".[streaming]"`).
 
 ---
 
@@ -213,7 +274,7 @@ WanderGlyph/
 
 Fork → Branch → Commit → Push → PR 🚀
 
-WanderGlyph is actively developed. Got a feature idea or bug report?  
+WanderGlyph is actively developed. Got a feature idea or bug report?
 Open an issue or reach out at **royyraa@outlook.com**
 
 ---
